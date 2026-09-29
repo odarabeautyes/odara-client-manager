@@ -1,1 +1,314 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#8d7668">
+<link rel="manifest" href="manifest.json">
+<title>ODÁRA Beauty Essentials</title>
+<style>
+:root{--a:#8d7668;--a2:#6f5b50;--bg:#f8f5f1;--line:#e8dfd8;--mut:#81756e;--ink:#302a27;--ok:#47765a;--warn:#9b6b24;--danger:#a84e4e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.login{min-height:100vh;display:grid;place-items:center;padding:22px;background:linear-gradient(135deg,#f7f0eb,#eee7e0)}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 18px 60px #0001}
+.login .card{width:min(420px,100%)}.logo{text-align:center;font-size:30px;font-weight:800;letter-spacing:2px}.sub,.muted{color:var(--mut);font-size:13px}.sub{text-align:center;margin:5px 0 22px}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}.field{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff}.primary{border:0;background:var(--a);color:#fff;border-radius:11px;padding:11px 14px;font-weight:700}.primary:hover{background:var(--a2)}
+.wide{width:100%;margin-top:16px}.msg{text-align:center;min-height:20px;margin-top:10px;font-size:13px}.hidden{display:none!important}
+.top{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:13px 17px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;letter-spacing:1px}.logout,.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px}.btn:hover{background:#f7f2ee}
+.tabs{display:flex;gap:7px;overflow:auto;background:#fff;border-bottom:1px solid var(--line);padding:11px}.tab{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px}.tab.active{background:var(--a);color:#fff;border-color:var(--a)}
+main{max-width:1120px;margin:auto;padding:15px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}.stat b{display:block;font-size:24px;margin-top:4px}
+.list{display:grid;gap:10px}.row{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px}.rowtop{display:flex;justify-content:space-between;gap:10px}.pill{background:#eee6df;border-radius:999px;padding:4px 8px;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.danger{color:var(--danger)}
+.modal{position:fixed;inset:0;background:#0006;display:grid;place-items:center;padding:14px;z-index:20}.modalbox{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;padding:18px}.mhead{display:flex;justify-content:space-between;align-items:center}.x{border:0;background:transparent;font-size:24px}.divider{height:1px;background:var(--line);margin:15px 0}
+.photo{width:82px;height:82px;border-radius:50%;object-fit:cover;border:1px solid var(--line);background:#f4eee9}.profile{display:flex;gap:14px;align-items:center}.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.kpi>div{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fcfaf8}.kpi b{display:block;font-size:18px;margin-top:3px}.section-title{font-size:15px;font-weight:800;margin:14px 0 8px}.empty{padding:12px;color:var(--mut);border:1px dashed var(--line);border-radius:12px}
+.small{font-size:12px}.ok{color:var(--ok)}.warn{color:var(--warn)}
+@media(max-width:700px){.grid,.grid3,.stats,.kpi{grid-template-columns:1fr}.user{display:none}.top{padding:12px}.modalbox{padding:15px}}
+</style>
+</head>
+<body>
 
+<div id="login" class="login">
+  <div class="card">
+    <div class="logo">ODÁRA</div>
+    <div class="sub">Beauty Essentials · Client Manager</div>
+    <label>Correo</label><input id="email" class="field" type="email" autocomplete="username">
+    <label>Contraseña</label><input id="password" class="field" type="password" autocomplete="current-password">
+    <button id="loginBtn" class="primary wide">Entrar</button>
+    <div id="msg" class="msg"></div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+<header class="top">
+  <div class="brand">ODÁRA</div>
+  <div><span id="user" class="muted user"></span> <button id="logout" class="logout">Salir</button></div>
+</header>
+<nav class="tabs">
+  <button class="tab active" data-v="home">Inicio</button>
+  <button class="tab" data-v="clients">Clientas</button>
+  <button class="tab" data-v="appts">Citas</button>
+  <button class="tab" data-v="payments">Pagos</button>
+  <button class="tab" data-v="inventory">Inventario</button>
+  <button class="tab" data-v="tirze">Tirze</button>
+</nav>
+
+<main>
+<section id="home" class="view">
+  <div class="panel"><h2>Hola ✨</h2><div class="muted">Tu información está conectada a la nube de ODÁRA.</div></div>
+  <div class="stats">
+    <div class="stat"><span class="muted">Clientas</span><b id="sc">0</b></div>
+    <div class="stat"><span class="muted">Citas</span><b id="sa">0</b></div>
+    <div class="stat"><span class="muted">Saldo</span><b id="sb">$0.00</b></div>
+  </div>
+  <div class="panel" style="margin-top:14px"><div class="section-title">Próximas citas</div><div id="upcoming" class="list"></div></div>
+</section>
+
+<section id="clients" class="view hidden">
+  <div class="panel">
+    <button class="primary" onclick="clientForm()">+ Nueva clienta</button>
+    <input id="search" class="field" style="max-width:420px;margin-top:8px" placeholder="Buscar nombre o teléfono">
+  </div>
+  <div id="clientList" class="list"></div>
+</section>
+
+<section id="appts" class="view hidden">
+  <div class="panel"><button class="primary" onclick="apptForm()">+ Nueva cita</button></div>
+  <div id="apptList" class="list"></div>
+</section>
+
+<section id="payments" class="view hidden">
+  <div class="panel"><button class="primary" onclick="payForm()">+ Registrar pago</button></div>
+  <div id="payList" class="list"></div>
+</section>
+
+<section id="inventory" class="view hidden">
+  <div class="panel"><button class="primary" onclick="invForm()">+ Producto</button></div>
+  <div id="invList" class="list"></div>
+</section>
+
+<section id="tirze" class="view hidden">
+  <div class="panel"><button class="primary" onclick="tirzeForm()">+ Registro Tirze</button></div>
+  <div id="tirzeList" class="list"></div>
+</section>
+</main>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modalbox">
+    <div class="mhead"><h2 id="mt">Nuevo</h2><button class="x" onclick="closeM()">×</button></div>
+    <div id="mb"></div>
+  </div>
+</div>
+
+<script>
+const URL="https://dterplmhtscjoeslweav.supabase.co";
+const KEY="sb_publishable_GpwmY6Aj1C8A1wI0x4iBnw_2uYLD9uo";
+const AUTH=URL+"/auth/v1", REST=URL+"/rest/v1";
+let TOKEN=localStorage.getItem("odara_access_token")||"", REFRESH=localStorage.getItem("odara_refresh_token")||"", USER=localStorage.getItem("odara_user_email")||"";
+let D={c:[],a:[],p:[],i:[],t:[]};
+const $=x=>document.getElementById(x);
+const esc=x=>String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const money=x=>'$'+Number(x||0).toFixed(2);
+const today=()=>new Date().toISOString().slice(0,10);
+const fmtDate=x=>x?new Date(x+"T00:00:00").toLocaleDateString("es-MX",{year:"numeric",month:"short",day:"numeric"}):"—";
+function toast(x){const m=$('msg');if(m)m.textContent=x||''}
+function closeM(){$('modal').classList.add('hidden')}
+function modal(t,b){$('mt').textContent=t;$('mb').innerHTML=b;$('modal').classList.remove('hidden')}
+async function auth(path,body){
+  const r=await fetch(AUTH+path,{method:'POST',headers:{'apikey':KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  let j={};try{j=await r.json()}catch{}
+  if(!r.ok)throw new Error(j.error_description||j.msg||j.message||'No se pudo iniciar sesión.');
+  return j
+}
+function saveSession(j){TOKEN=j.access_token||'';REFRESH=j.refresh_token||REFRESH;USER=j.user?.email||USER;if(TOKEN)localStorage.setItem('odara_access_token',TOKEN);if(REFRESH)localStorage.setItem('odara_refresh_token',REFRESH);if(USER)localStorage.setItem('odara_user_email',USER)}
+function clearSession(){TOKEN='';REFRESH='';USER='';localStorage.removeItem('odara_access_token');localStorage.removeItem('odara_refresh_token');localStorage.removeItem('odara_user_email')}
+async function refreshSession(){if(!REFRESH)return false;try{saveSession(await auth('/token?grant_type=refresh_token',{refresh_token:REFRESH}));return true}catch{return false}}
+async function api(path,options={}){
+  let headers=Object.assign({'apikey':KEY,'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json','Prefer':'return=representation'},options.headers||{});
+  let r=await fetch(REST+path,Object.assign({},options,{headers}));
+  if(r.status===401&&REFRESH){if(await refreshSession()){headers.Authorization='Bearer '+TOKEN;r=await fetch(REST+path,Object.assign({},options,{headers}))}}
+  const text=await r.text();let j=null;try{j=text?JSON.parse(text):null}catch{}
+  if(!r.ok)throw new Error(j?.message||j?.hint||j?.details||text||('Error '+r.status));return j
+}
+async function load(){
+  if(!TOKEN)return;
+  const [c,a,p,i,t]=await Promise.all([
+    api('/clients?select=*&order=created_at.desc'),
+    api('/appointments?select=*,clients(name)&order=appointment_date.asc,appointment_time.asc'),
+    api('/payments?select=*,clients(name)&order=payment_date.desc'),
+    api('/inventory?select=*&order=name.asc'),
+    api('/tirze_records?select=*,clients(name)&order=application_date.desc,created_at.desc')
+  ]);
+  D={c:c||[],a:a||[],p:p||[],i:i||[],t:t||[]};render()
+}
+function render(){
+  $('sc').textContent=D.c.length;$('sa').textContent=D.a.length;$('sb').textContent=money(D.c.reduce((n,x)=>n+Number(x.balance||0),0));
+  const q=($('search')?.value||'').toLowerCase();
+  $('clientList').innerHTML=D.c.filter(x=>(x.name+' '+(x.phone||'')).toLowerCase().includes(q)).map(x=>{
+    const photo=x.photo_url?`<img class="photo" src="${esc(x.photo_url)}" alt="">`:`<div class="photo" style="display:grid;place-items:center;font-size:26px">👤</div>`;
+    return `<div class="row"><div class="rowtop"><div class="profile">${photo}<div><b>${esc(x.name)}</b><div class="muted">${esc(x.phone||'')} · ${esc(x.service||'')}</div><div class="small muted">${x.next_date?'Próxima: '+fmtDate(x.next_date):'Sin próxima cita'}</div></div></div><span class="pill">${esc(x.status||'Activa')}</span></div>${Number(x.balance||0)>0?`<div class="danger" style="margin-top:8px">Saldo pendiente: <b>${money(x.balance)}</b></div>`:''}<div class="actions"><button class="primary" onclick="clientDetail('${x.id}')">Ver expediente</button><button class="btn" onclick="clientForm('${x.id}')">Editar</button><button class="btn danger" onclick="del('clients','${x.id}')">Eliminar</button></div></div>`
+  }).join('')||'<div class="panel">No hay clientas.</div>';
+
+  const now=today();
+  $('upcoming').innerHTML=D.a.filter(x=>x.appointment_date>=now).slice(0,5).map(x=>`<div class="row"><div class="rowtop"><b>${esc(x.clients?.name||'Clienta')}</b><span class="pill">${fmtDate(x.appointment_date)}</span></div><div>${esc(x.appointment_time||'')} · ${esc(x.service||'')}</div><div class="muted">${esc(x.status||'Programada')} · ${money(x.price)}</div></div>`).join('')||'<div class="empty">No hay citas próximas.</div>';
+
+  $('apptList').innerHTML=D.a.map(x=>`<div class="row"><div class="rowtop"><b>${esc(x.clients?.name||'Clienta')}</b><span class="pill">${esc(x.status||'Programada')}</span></div><div>${fmtDate(x.appointment_date)} · ${esc(x.appointment_time||'')} · ${esc(x.service||'')}</div><div class="muted">${money(x.price)} ${x.notes?'· '+esc(x.notes):''}</div><div class="actions"><button class="btn" onclick="apptForm('${x.id}')">Editar</button><button class="btn danger" onclick="del('appointments','${x.id}')">Eliminar</button></div></div>`).join('')||'<div class="panel">No hay citas.</div>';
+
+  $('payList').innerHTML=D.p.map(x=>`<div class="row"><div class="rowtop"><b>${esc(x.clients?.name||'Clienta')}</b><b>${money(x.amount)}</b></div><div>${fmtDate(x.payment_date)} · ${esc(x.method||'')}</div><div class="muted">${esc(x.note||'')}</div><div class="actions"><button class="btn danger" onclick="del('payments','${x.id}')">Eliminar</button></div></div>`).join('')||'<div class="panel">No hay pagos.</div>';
+
+  $('invList').innerHTML=D.i.map(x=>`<div class="row"><div class="rowtop"><b>${esc(x.name)}</b><span class="${Number(x.quantity)<=Number(x.minimum_quantity||0)?'warn':'ok'}">${Number(x.quantity)<=Number(x.minimum_quantity||0)?'⚠ Bajo':'● OK'}</span></div><div>${esc(x.category||'')} · Cantidad: <b>${x.quantity}</b> · Mínimo: ${x.minimum_quantity||0}</div><div class="muted">Costo: ${money(x.cost)}</div><div class="actions"><button class="btn" onclick="invForm('${x.id}')">Editar</button><button class="btn danger" onclick="del('inventory','${x.id}')">Eliminar</button></div></div>`).join('')||'<div class="panel">No hay productos.</div>';
+
+  $('tirzeList').innerHTML=D.t.map(x=>`<div class="row"><div class="rowtop"><b>${esc(x.clients?.name||'Clienta')}</b><span class="pill">${esc(x.dose||'Sin dosis')}</span></div><div>${x.application_date?fmtDate(x.application_date):fmtDate((x.created_at||'').slice(0,10))} ${x.weight?`· ${esc(x.weight)} kg`:''}</div><div class="muted">${esc(x.follow_up||'')}</div><div>${esc(x.notes||'')}</div><div class="actions"><button class="btn" onclick="tirzeForm('${x.id}')">Editar</button><button class="btn danger" onclick="del('tirze_records','${x.id}')">Eliminar</button></div></div>`).join('')||'<div class="panel">No hay registros de Tirze.</div>';
+}
+const opts=s=>D.c.map(x=>`<option value="${x.id}" ${x.id===s?'selected':''}>${esc(x.name)}</option>`).join('');
+
+function clientDetail(id){
+  const x=D.c.find(z=>z.id===id); if(!x)return;
+  const ap=D.a.filter(z=>z.client_id===id).sort((a,b)=>(b.appointment_date||'').localeCompare(a.appointment_date||''));
+  const pa=D.p.filter(z=>z.client_id===id).sort((a,b)=>(b.payment_date||'').localeCompare(a.payment_date||''));
+  const tr=D.t.filter(z=>z.client_id===id).sort((a,b)=>(b.application_date||b.created_at||'').localeCompare(a.application_date||a.created_at||''));
+  const photo=x.photo_url?`<img class="photo" src="${esc(x.photo_url)}" alt="">`:`<div class="photo" style="display:grid;place-items:center;font-size:26px">👤</div>`;
+  modal('Expediente de '+esc(x.name),`
+    <div class="profile">${photo}<div><h3 style="margin:0">${esc(x.name)}</h3><div class="muted">${esc(x.service||'')} · ${esc(x.phone||'')}</div><div class="small muted">${esc(x.email||'')}</div></div></div>
+    <div class="kpi">
+      <div><span class="muted small">Saldo</span><b>${money(x.balance)}</b></div>
+      <div><span class="muted small">Precio</span><b>${money(x.price)}</b></div>
+      <div><span class="muted small">Última</span><b>${x.last_date?fmtDate(x.last_date):'—'}</b></div>
+      <div><span class="muted small">Próxima</span><b>${x.next_date?fmtDate(x.next_date):'—'}</b></div>
+    </div>
+    <div class="actions"><button class="primary" onclick="clientForm('${x.id}')">Editar expediente</button><button class="btn" onclick="apptForm('', '${x.id}')">+ Cita</button><button class="btn" onclick="payForm('${x.id}')">+ Pago</button></div>
+    <div class="divider"></div>
+    <div class="section-title">Información personal</div>
+    <div class="grid"><div><b>Fecha de nacimiento</b><div class="muted">${x.birth_date?fmtDate(x.birth_date):'—'}</div></div><div><b>Contacto de emergencia</b><div class="muted">${esc(x.emergency_contact||'—')}</div></div></div>
+    <div class="section-title">Notas generales</div><div class="empty">${esc(x.notes||'Sin notas')}</div>
+    <div class="section-title">Consentimiento / antecedentes</div><div class="empty">${esc(x.consent_notes||'Sin notas')}</div>
+    <div class="section-title">Aftercare</div><div class="empty">${esc(x.aftercare_notes||'Sin notas')}</div>
+    <div class="section-title">Productos utilizados</div><div class="empty">${esc(x.products_used||'Sin registro')}</div>
+    <div class="divider"></div>
+    <div class="section-title">Historial de citas (${ap.length})</div>
+    ${ap.map(a=>`<div class="row"><b>${fmtDate(a.appointment_date)}</b> · ${esc(a.appointment_time||'')} · ${esc(a.service||'')}<div class="muted">${esc(a.status||'Programada')} · ${money(a.price)}${a.notes?' · '+esc(a.notes):''}</div></div>`).join('')||'<div class="empty">Sin citas registradas.</div>'}
+    <div class="section-title">Historial de pagos (${pa.length})</div>
+    ${pa.map(p=>`<div class="row"><b>${money(p.amount)}</b> · ${fmtDate(p.payment_date)} · ${esc(p.method||'')}<div class="muted">${esc(p.note||'')}</div></div>`).join('')||'<div class="empty">Sin pagos registrados.</div>'}
+    <div class="section-title">Historial Tirze (${tr.length})</div>
+    ${tr.map(t=>`<div class="row"><b>${t.application_date?fmtDate(t.application_date):fmtDate((t.created_at||'').slice(0,10))}</b> · ${esc(t.dose||'Sin dosis')}${t.weight?' · '+esc(t.weight)+' kg':''}<div class="muted">${esc(t.follow_up||'')}</div><div>${esc(t.notes||'')}</div></div>`).join('')||'<div class="empty">Sin registros Tirze.</div>'}
+  `);
+}
+
+function clientForm(id=''){
+  const x=D.c.find(z=>z.id===id)||{};
+  modal(id?'Editar expediente':'Nueva clienta',`
+    <div class="grid">
+      <div><label>Nombre *</label><input id="n" class="field" value="${esc(x.name)}"></div>
+      <div><label>Teléfono</label><input id="ph" class="field" value="${esc(x.phone)}"></div>
+      <div><label>Correo</label><input id="em" class="field" type="email" value="${esc(x.email)}"></div>
+      <div><label>Fecha de nacimiento</label><input id="bd" class="field" type="date" value="${x.birth_date||''}"></div>
+      <div><label>Servicio principal</label><select id="sv" class="field"><option>Tirze</option><option>Pestañas</option><option>Faciales</option><option>Brows</option><option>Otros</option></select></div>
+      <div><label>Estado</label><select id="st" class="field"><option>Activa</option><option>Inactiva</option></select></div>
+      <div><label>Última fecha</label><input id="ld" class="field" type="date" value="${x.last_date||''}"></div>
+      <div><label>Próxima fecha</label><input id="nd" class="field" type="date" value="${x.next_date||''}"></div>
+      <div><label>Precio habitual</label><input id="pr" class="field" type="number" step=".01" value="${x.price||0}"></div>
+      <div><label>Saldo pendiente</label><input id="bal" class="field" type="number" step=".01" value="${x.balance||0}"></div>
+      <div style="grid-column:1/-1"><label>Foto de perfil (URL opcional)</label><input id="pu" class="field" placeholder="https://..." value="${esc(x.photo_url)}"></div>
+      <div style="grid-column:1/-1"><label>Contacto de emergencia</label><input id="ec" class="field" value="${esc(x.emergency_contact)}"></div>
+    </div>
+    <label>Notas generales</label><textarea id="no" class="field" rows="4">${esc(x.notes)}</textarea>
+    <label>Consentimiento / antecedentes</label><textarea id="co" class="field" rows="4">${esc(x.consent_notes)}</textarea>
+    <label>Aftercare / cuidados posteriores</label><textarea id="af" class="field" rows="4">${esc(x.aftercare_notes)}</textarea>
+    <label>Productos utilizados</label><textarea id="pru" class="field" rows="3">${esc(x.products_used)}</textarea>
+    <button class="primary wide" onclick="saveClient('${id}')">Guardar expediente</button>
+  `);
+  if(x.service)$('sv').value=x.service;if(x.status)$('st').value=x.status;
+}
+async function saveClient(id){
+  try{
+    const r={name:$('n').value.trim(),phone:$('ph').value.trim(),email:$('em').value.trim()||null,birth_date:$('bd').value||null,service:$('sv').value,status:$('st').value,last_date:$('ld').value||null,next_date:$('nd').value||null,price:+$('pr').value||0,balance:+$('bal').value||0,photo_url:$('pu').value.trim()||null,emergency_contact:$('ec').value.trim()||null,notes:$('no').value.trim(),consent_notes:$('co').value.trim(),aftercare_notes:$('af').value.trim(),products_used:$('pru').value.trim()};
+    if(!r.name)return toast('Escribe el nombre');
+    if(id)await api('/clients?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(r)});else await api('/clients',{method:'POST',body:JSON.stringify(r)});
+    closeM();await load()
+  }catch(e){toast(e.message)}
+}
+
+function apptForm(id='',clientId=''){
+  const x=D.a.find(z=>z.id===id)||{};
+  modal(id?'Editar cita':'Nueva cita',`
+    <label>Clienta</label><select id="ac" class="field">${opts(x.client_id||clientId)}</select>
+    <div class="grid"><div><label>Fecha</label><input id="ad" class="field" type="date" value="${x.appointment_date||today()}"></div><div><label>Hora</label><input id="at" class="field" type="time" value="${x.appointment_time||''}"></div></div>
+    <div class="grid"><div><label>Servicio</label><input id="as" class="field" value="${esc(x.service)}"></div><div><label>Precio</label><input id="ap" class="field" type="number" step=".01" value="${x.price||0}"></div></div>
+    <label>Estado</label><select id="ast" class="field"><option>Programada</option><option>Completada</option><option>Cancelada</option><option>No se presentó</option></select>
+    <label>Notas</label><textarea id="an" class="field" rows="3">${esc(x.notes)}</textarea>
+    <button class="primary wide" onclick="saveAppt('${id}')">Guardar</button>
+  `);
+  if(x.status)$('ast').value=x.status;
+}
+async function saveAppt(id){
+  try{
+    const r={client_id:$('ac').value,appointment_date:$('ad').value,appointment_time:$('at').value||null,service:$('as').value.trim(),price:+$('ap').value||0,status:$('ast').value,notes:$('an').value.trim()};
+    if(id)await api('/appointments?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(r)});else await api('/appointments',{method:'POST',body:JSON.stringify(r)});
+    closeM();await load()
+  }catch(e){toast(e.message)}
+}
+
+function payForm(clientId=''){
+  modal('Registrar pago',`<label>Clienta</label><select id="pc" class="field">${opts(clientId)}</select><label>Fecha</label><input id="pd" class="field" type="date" value="${today()}"><label>Monto</label><input id="pa" class="field" type="number" step=".01"><label>Método</label><select id="pm" class="field"><option>Cash</option><option>Zelle</option><option>CashApp</option><option>Tarjeta</option><option>Transferencia</option></select><label>Nota</label><textarea id="pn" class="field"></textarea><button class="primary wide" onclick="savePay()">Guardar</button>`)
+}
+async function savePay(){
+  try{
+    const cid=$('pc').value,amt=+$('pa').value||0;if(!cid||amt<=0)return toast('Selecciona clienta y monto');
+    await api('/payments',{method:'POST',body:JSON.stringify({client_id:cid,payment_date:$('pd').value,amount:amt,method:$('pm').value,note:$('pn').value})});
+    const c=D.c.find(x=>x.id===cid);if(c)await api('/clients?id=eq.'+encodeURIComponent(cid),{method:'PATCH',body:JSON.stringify({balance:Math.max(0,+c.balance-amt)})});
+    closeM();await load()
+  }catch(e){toast(e.message)}
+}
+
+function invForm(id=''){
+  const x=D.i.find(z=>z.id===id)||{};
+  modal(id?'Editar producto':'Nuevo producto',`<label>Nombre</label><input id="ii" class="field" value="${esc(x.name)}"><label>Categoría</label><input id="ic" class="field" value="${esc(x.category)}"><div class="grid"><div><label>Cantidad</label><input id="iq" class="field" type="number" value="${x.quantity||0}"></div><div><label>Mínimo</label><input id="im" class="field" type="number" value="${x.minimum_quantity||0}"></div></div><label>Costo</label><input id="ix" class="field" type="number" step=".01" value="${x.cost||0}"><button class="primary wide" onclick="saveInv('${id}')">Guardar</button>`)
+}
+async function saveInv(id){
+  try{const r={name:$('ii').value.trim(),category:$('ic').value.trim(),quantity:+$('iq').value||0,minimum_quantity:+$('im').value||0,cost:+$('ix').value||0};if(id)await api('/inventory?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(r)});else await api('/inventory',{method:'POST',body:JSON.stringify(r)});closeM();await load()}catch(e){toast(e.message)}
+}
+
+function tirzeForm(id=''){
+  const x=D.t.find(z=>z.id===id)||{};
+  modal(id?'Editar registro Tirze':'Nuevo registro de Tirze',`
+    <label>Clienta</label><select id="tc" class="field">${opts(x.client_id)}</select>
+    <div class="grid"><div><label>Fecha de aplicación</label><input id="td" class="field" type="date" value="${x.application_date||today()}"></div><div><label>Dosis</label><input id="tdose" class="field" placeholder="Ej. 2.5 mg" value="${esc(x.dose)}"></div></div>
+    <div class="grid"><div><label>Peso (kg)</label><input id="tw" class="field" type="number" step=".1" value="${x.weight||''}"></div><div><label>Próxima aplicación</label><input id="tnext" class="field" type="date" value="${x.next_application_date||''}"></div></div>
+    <label>Seguimiento</label><input id="tf" class="field" placeholder="Ej. revisar tolerancia / próxima cita" value="${esc(x.follow_up)}">
+    <label>Notas</label><textarea id="tn" class="field" rows="6" placeholder="Observaciones del servicio...">${esc(x.notes)}</textarea>
+    <button class="primary wide" onclick="saveT('${id}')">Guardar</button>
+  `)
+}
+async function saveT(id){
+  try{
+    const r={client_id:$('tc').value,application_date:$('td').value||null,dose:$('tdose').value.trim(),weight:$('tw').value===''?null:+$('tw').value,next_application_date:$('tnext').value||null,follow_up:$('tf').value.trim(),notes:$('tn').value.trim()};
+    if(id)await api('/tirze_records?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(r)});else await api('/tirze_records',{method:'POST',body:JSON.stringify(r)});
+    closeM();await load()
+  }catch(e){toast(e.message)}
+}
+
+async function del(table,id){
+  if(!confirm('¿Eliminar este registro?'))return;
+  try{await api('/'+table+'?id=eq.'+encodeURIComponent(id),{method:'DELETE'});await load()}catch(e){toast(e.message)}
+}
+$('search').oninput=render;
+$('loginBtn').onclick=async()=>{
+  const email=$('email').value.trim(),password=$('password').value;
+  if(!email||!password)return toast('Escribe tu correo y contraseña.');
+  const b=$('loginBtn');b.disabled=true;b.textContent='Entrando…';toast('Conectando…');
+  try{saveSession(await auth('/token?grant_type=password',{email,password}));await showApp()}catch(e){toast(e.message)}finally{b.disabled=false;b.textContent='Entrar'}
+};
+async function showApp(){
+  try{$('login').classList.add('hidden');$('app').classList.remove('hidden');$('user').textContent=USER;toast('');await load()}
+  catch(e){$('app').classList.add('hidden');$('login').classList.remove('hidden');toast('Error al cargar tus datos: '+e.message)}
+}
+$('logout').onclick=()=>{clearSession();$('app').classList.add('hidden');$('login').classList.remove('hidden');toast('Sesión cerrada.')};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));$(b.dataset.v).classList.remove('hidden')});
+window.addEventListener('error',e=>{if(e.message&&e.message!=='Script error.')toast('Error de la página: '+e.message)});
+window.addEventListener('unhandledrejection',e=>toast('Error: '+(e.reason?.message||e.reason||'revisa tu conexión')));
+(async()=>{if(TOKEN){try{if(REFRESH)await refreshSession();await showApp()}catch{clearSession()}}})();
+</script>
+</body>
+</html>
