@@ -1,0 +1,10 @@
+{
+  "name": "ODÁRA Client Manager",
+  "short_name": "ODÁRA",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f7f3ef",
+  "theme_color": "#9a7b68",
+  "lang": "es",
+  "icons": []
+}

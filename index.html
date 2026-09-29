@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9a7b68">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ODÁRA">
+<title>ODÁRA • Client Manager</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#f7f3ef;--card:#fff;--ink:#302c29;--muted:#81766e;--accent:#9a7b68;--accent2:#d9c7b9;--line:#e9dfd8;--ok:#587b61;--warn:#9b713c;--danger:#a95757}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:700;letter-spacing:2.8px;font-size:20px}.brand small{display:block;font-size:9px;font-weight:500;letter-spacing:1.3px;color:var(--muted);margin-top:3px}
+main{max-width:1250px;margin:auto;padding:18px 16px 90px}.top{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:16px}.title{font-size:26px;font-weight:650}.muted{color:var(--muted);font-size:13px}
+button{border:0;border-radius:11px;padding:11px 14px;font:inherit;font-weight:650;cursor:pointer;background:var(--accent);color:#fff}button.secondary{background:#eee7e1;color:var(--ink)}button.ghost{background:transparent;color:var(--accent);padding:8px}button.danger{background:#fff0f0;color:var(--danger)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}.stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.stat b{font-size:26px;display:block;margin-top:6px}
+.nav{display:flex;gap:7px;overflow:auto;padding-bottom:10px;margin-bottom:4px}.nav button{white-space:nowrap;background:#eee7e1;color:var(--ink)}.nav button.active{background:var(--accent);color:#fff}
+.panel{display:none}.panel.active{display:block}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0 14px}.search{flex:1;min-width:220px;padding:12px 13px;border:1px solid var(--line);border-radius:11px;font:inherit;background:#fff}
+.gridcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.client{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px}.client h3{margin:0 0 5px;font-size:16px}.row{display:flex;justify-content:space-between;gap:10px;margin-top:9px;font-size:13px}.pill{display:inline-block;border-radius:20px;padding:5px 8px;background:#eee7e1;font-size:11px}.pill.ok{background:#e7f0e8;color:var(--ok)}.pill.warn{background:#f5ead9;color:var(--warn)}
+.list{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:auto}.listrow{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:10px;padding:13px;border-bottom:1px solid var(--line);align-items:center;font-size:13px}.listrow:last-child{border:0}.thead{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.7px}
+.empty{text-align:center;padding:42px;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;background:rgba(40,32,27,.35);z-index:20;align-items:flex-end;justify-content:center}.modal.show{display:flex}.dialog{background:#fff;width:min(760px,100%);max-height:94vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px}.dialog h2{margin:0 0 15px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:11px;color:var(--muted)}input,select,textarea{font:inherit;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff}textarea{min-height:85px}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.day{background:#fff;border:1px solid var(--line);border-radius:12px;min-height:105px;padding:9px}.day strong{font-size:12px}.appt{margin-top:7px;padding:6px;border-radius:8px;background:#eee7e1;font-size:10px}
+.note{background:#fff8ee;border:1px solid #eadcc9;padding:12px;border-radius:12px;font-size:12px;color:#66584b;margin-top:12px}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}.gridcards{grid-template-columns:1fr 1fr}.listrow{grid-template-columns:1.4fr 1fr 1fr auto}.listrow .hideMob{display:none}.calendar{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){header{padding:12px 14px}.brand{font-size:18px}.title{font-size:23px}.cards{gap:8px}.stat{padding:12px}.stat b{font-size:21px}.gridcards{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.dialog{padding:17px}.listrow{grid-template-columns:1.4fr 1fr auto}.listrow .hideMob2{display:none}}
+</style>
+</head>
+<body>
+<header><div class="brand">ODÁRA<small>BEAUTY ESSENTIALS</small></div><button onclick="openClient()">＋ Clienta</button></header>
+<main>
+  <div class="top"><div><div class="title" id="greeting">Hola 👋</div><div class="muted">Tu negocio, organizado desde un solo lugar.</div></div></div>
+  <div class="cards">
+    <div class="stat"><span>Clientas</span><b id="sClients">0</b></div>
+    <div class="stat"><span>Tirze</span><b id="sTirze">0</b></div>
+    <div class="stat"><span>Citas próximas</span><b id="sAppts">0</b></div>
+    <div class="stat"><span>Por cobrar</span><b id="sDue">$0</b></div>
+  </div>
+  <div class="nav">
+    <button class="active" onclick="tab('dashboard',this)">Inicio</button>
+    <button onclick="tab('clients',this)">Clientas</button>
+    <button onclick="tab('appointments',this)">Citas</button>
+    <button onclick="tab('tirze',this)">Tirze</button>
+    <button onclick="tab('payments',this)">Pagos</button>
+    <button onclick="tab('inventory',this)">Inventario</button>
+    <button onclick="tab('reports',this)">Reportes</button>
+  </div>
+
+  <section id="dashboard" class="panel active">
+    <div class="toolbar"><button onclick="openClient()">＋ Agregar clienta</button><button class="secondary" onclick="backup()">Respaldar datos</button><button class="secondary" onclick="document.getElementById('restore').click()">Restaurar</button><input id="restore" type="file" hidden accept=".json" onchange="restore(event)"></div>
+    <div class="gridcards" id="dashCards"></div>
+    <div class="note">💡 Esta versión está preparada para teléfono y computadora. Los datos se guardan en el dispositivo/navegador. Para que Mac y iPhone compartan automáticamente la misma información, el siguiente paso es publicarla con una base de datos segura.</div>
+  </section>
+
+  <section id="clients" class="panel">
+    <div class="toolbar"><input id="clientSearch" class="search" placeholder="Buscar nombre, teléfono o servicio…" oninput="renderClients()"><button onclick="openClient()">＋ Clienta</button></div>
+    <div class="gridcards" id="clientCards"></div>
+  </section>
+
+  <section id="appointments" class="panel">
+    <div class="toolbar"><button onclick="openAppt()">＋ Nueva cita</button><button class="secondary" onclick="exportCSV()">Exportar citas</button></div>
+    <div class="list" id="apptList"></div>
+  </section>
+
+  <section id="tirze" class="panel">
+    <div class="toolbar"><input id="tirzeSearch" class="search" placeholder="Buscar clienta de Tirze…" oninput="renderTirze()"></div>
+    <div class="list" id="tirzeList"></div>
+    <div class="note">⚠️ Usa esta sección como registro administrativo de las clientas y de la información que estés autorizada a recopilar. No sustituye evaluación, prescripción ni seguimiento médico.</div>
+  </section>
+
+  <section id="payments" class="panel">
+    <div class="toolbar"><button onclick="openPayment()">＋ Registrar pago</button></div>
+    <div class="list" id="payList"></div>
+  </section>
+
+  <section id="inventory" class="panel">
+    <div class="toolbar"><button onclick="openInventory()">＋ Producto</button></div>
+    <div class="gridcards" id="invCards"></div>
+  </section>
+
+  <section id="reports" class="panel">
+    <div class="gridcards" id="reportCards"></div>
+    <div class="note">Los reportes se calculan con la información registrada en esta aplicación.</div>
+  </section>
+</main>
+
+<div class="modal" id="modal"><div class="dialog"><h2 id="modalTitle"></h2><div id="modalBody"></div></div></div>
+
+<script>
+const KEY='odara_pro_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"clients":[],"appointments":[],"payments":[],"inventory":[]}');
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
+function money(x){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(x||0))}
+function id(){return crypto.randomUUID()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function tab(name,el){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.getElementById(name).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderAll()}
+function openModal(title,body){document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').innerHTML=body;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()})
+
+function openClient(c=null){
+ openModal(c?'Editar clienta':'Nueva clienta',`
+ <form onsubmit="saveClient(event,'${c?.id||''}')"><div class="formgrid">
+ <div class="field"><label>Nombre completo</label><input id="f_name" required value="${esc(c?.name||'')}"></div>
+ <div class="field"><label>Teléfono</label><input id="f_phone" value="${esc(c?.phone||'')}"></div>
+ <div class="field"><label>Servicio principal</label><select id="f_service">${['Tirze','Pestañas','Faciales','Brows','Otros'].map(x=>`<option ${x===c?.service?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div class="field"><label>Estado</label><select id="f_status"><option ${c?.status==='Activa'?'selected':''}>Activa</option><option ${c?.status==='Seguimiento'?'selected':''}>Seguimiento</option><option ${c?.status==='Inactiva'?'selected':''}>Inactiva</option></select></div>
+ <div class="field"><label>Última cita</label><input id="f_last" type="date" value="${c?.last||''}"></div>
+ <div class="field"><label>Próxima cita</label><input id="f_next" type="date" value="${c?.next||''}"></div>
+ <div class="field"><label>Total habitual</label><input id="f_price" type="number" step=".01" value="${c?.price||''}"></div>
+ <div class="field"><label>Saldo pendiente</label><input id="f_balance" type="number" step=".01" value="${c?.balance||''}"></div>
+ <div class="field full"><label>Notas</label><textarea id="f_notes">${esc(c?.notes||'')}</textarea></div>
+ </div><div class="actions"><button type="button" class="secondary" onclick="closeModal()">Cancelar</button><button>Guardar</button></div></form>`)
+}
+function saveClient(e,old){e.preventDefault();const c={id:old||id(),name:f_name.value.trim(),phone:f_phone.value.trim(),service:f_service.value,status:f_status.value,last:f_last.value,next:f_next.value,price:f_price.value,balance:f_balance.value,notes:f_notes.value};const i=db.clients.findIndex(x=>x.id===c.id);i>=0?db.clients[i]=c:db.clients.push(c);closeModal();persist()}
+function editClient(i){openClient(db.clients.find(c=>c.id===i))}
+function deleteClient(i){if(confirm('¿Eliminar esta clienta?')){db.clients=db.clients.filter(c=>c.id!==i);persist()}}
+function renderClients(){const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();const a=db.clients.filter(c=>[c.name,c.phone,c.service].join(' ').toLowerCase().includes(q));document.getElementById('clientCards').innerHTML=a.length?a.map(c=>`<div class="client"><h3>${esc(c.name)}</h3><span class="pill">${esc(c.service)}</span><div class="row"><span>${esc(c.phone||'Sin teléfono')}</span><b>${money(c.balance)}</b></div><div class="row muted"><span>Próxima: ${c.next||'—'}</span><span>${esc(c.status)}</span></div><div class="row"><button class="secondary" onclick="editClient('${c.id}')">Editar</button><button class="danger" onclick="deleteClient('${c.id}')">Eliminar</button></div></div>`).join(''):'<div class="empty">No hay clientas que coincidan.</div>'}
+
+function openAppt(a=null){
+ const opts=db.clients.map(c=>`<option value="${c.id}" ${a?.clientId===c.id?'selected':''}>${esc(c.name)}</option>`).join('');
+ openModal(a?'Editar cita':'Nueva cita',`<form onsubmit="saveAppt(event,'${a?.id||''}')"><div class="formgrid">
+ <div class="field full"><label>Clienta</label><select id="a_client" required>${opts||'<option value="">Primero agrega una clienta</option>'}</select></div>
+ <div class="field"><label>Fecha</label><input id="a_date" type="date" required value="${a?.date||new Date().toISOString().slice(0,10)}"></div>
+ <div class="field"><label>Hora</label><input id="a_time" type="time" value="${a?.time||''}"></div>
+ <div class="field"><label>Servicio</label><input id="a_service" value="${esc(a?.service||'')}" placeholder="Lashes, facial, brows…"></div>
+ <div class="field"><label>Precio</label><input id="a_price" type="number" step=".01" value="${a?.price||''}"></div>
+ <div class="field full"><label>Notas</label><textarea id="a_notes">${esc(a?.notes||'')}</textarea></div></div><div class="actions"><button type="button" class="secondary" onclick="closeModal()">Cancelar</button><button>Guardar</button></div></form>`)
+}
+function saveAppt(e,old){e.preventDefault();const a={id:old||id(),clientId:a_client.value,date:a_date.value,time:a_time.value,service:a_service.value,price:a_price.value,notes:a_notes.value};const i=db.appointments.findIndex(x=>x.id===a.id);i>=0?db.appointments[i]=a:db.appointments.push(a);closeModal();persist()}
+function deleteAppt(i){if(confirm('¿Eliminar esta cita?')){db.appointments=db.appointments.filter(a=>a.id!==i);persist()}}
+function renderAppts(){const a=[...db.appointments].sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time));document.getElementById('apptList').innerHTML=a.length?`<div class="listrow thead"><span>Clienta</span><span>Fecha</span><span>Servicio</span><span>Precio</span><span></span></div>`+a.map(x=>{const c=db.clients.find(c=>c.id===x.clientId);return `<div class="listrow"><span><b>${esc(c?.name||'Eliminada')}</b><small class="muted">${x.time||''}</small></span><span>${x.date}</span><span>${esc(x.service)}</span><span>${money(x.price)}</span><span><button class="danger" onclick="deleteAppt('${x.id}')">×</button></span></div>`}).join(''):'<div class="empty">No hay citas registradas.</div>'}
+
+function renderTirze(){const q=(document.getElementById('tirzeSearch')?.value||'').toLowerCase();const a=db.clients.filter(c=>c.service==='Tirze'&&c.name.toLowerCase().includes(q));document.getElementById('tirzeList').innerHTML=a.length?`<div class="listrow thead"><span>Clienta</span><span>Teléfono</span><span>Última</span><span>Próxima</span><span></span></div>`+a.map(c=>`<div class="listrow"><span><b>${esc(c.name)}</b></span><span>${esc(c.phone||'—')}</span><span>${c.last||'—'}</span><span>${c.next||'—'}</span><span><button class="secondary" onclick="editClient('${c.id}')">Abrir</button></span></div>`).join(''):'<div class="empty">No hay clientas de Tirze registradas.</div>'}
+
+function openPayment(p=null){const opts=db.clients.map(c=>`<option value="${c.id}" ${p?.clientId===c.id?'selected':''}>${esc(c.name)}</option>`).join('');openModal(p?'Editar pago':'Registrar pago',`<form onsubmit="savePayment(event,'${p?.id||''}')"><div class="formgrid"><div class="field full"><label>Clienta</label><select id="p_client">${opts}</select></div><div class="field"><label>Fecha</label><input id="p_date" type="date" value="${p?.date||new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Monto</label><input id="p_amount" type="number" step=".01" required value="${p?.amount||''}"></div><div class="field"><label>Método</label><select id="p_method"><option>Cash</option><option>Zelle</option><option>CashApp</option><option>Tarjeta</option><option>Otro</option></select></div><div class="field full"><label>Nota</label><input id="p_note" value="${esc(p?.note||'')}"></div></div><div class="actions"><button type="button" class="secondary" onclick="closeModal()">Cancelar</button><button>Guardar</button></div></form>`)}
+function savePayment(e,old){e.preventDefault();const p={id:old||id(),clientId:p_client.value,date:p_date.value,amount:p_amount.value,method:p_method.value,note:p_note.value};const i=db.payments.findIndex(x=>x.id===p.id);i>=0?db.payments[i]=p:db.payments.push(p);closeModal();persist()}
+function deletePayment(i){db.payments=db.payments.filter(p=>p.id!==i);persist()}
+function renderPayments(){const a=[...db.payments].sort((x,y)=>y.date.localeCompare(x.date));document.getElementById('payList').innerHTML=a.length?`<div class="listrow thead"><span>Clienta</span><span>Fecha</span><span>Método</span><span>Monto</span><span></span></div>`+a.map(p=>`<div class="listrow"><span>${esc(db.clients.find(c=>c.id===p.clientId)?.name||'—')}</span><span>${p.date}</span><span>${p.method}</span><span><b>${money(p.amount)}</b></span><span><button class="danger" onclick="deletePayment('${p.id}')">×</button></span></div>`).join(''):'<div class="empty">No hay pagos registrados.</div>'}
+
+function openInventory(i=null){const x=i?db.inventory.find(v=>v.id===i):null;openModal(x?'Editar producto':'Nuevo producto',`<form onsubmit="saveInv(event,'${x?.id||''}')"><div class="formgrid"><div class="field"><label>Producto</label><input id="i_name" required value="${esc(x?.name||'')}"></div><div class="field"><label>Categoría</label><input id="i_cat" value="${esc(x?.cat||'')}"></div><div class="field"><label>Existencia</label><input id="i_qty" type="number" step="1" value="${x?.qty??0}"></div><div class="field"><label>Mínimo</label><input id="i_min" type="number" step="1" value="${x?.min??1}"></div><div class="field"><label>Costo</label><input id="i_cost" type="number" step=".01" value="${x?.cost||''}"></div></div><div class="actions"><button type="button" class="secondary" onclick="closeModal()">Cancelar</button><button>Guardar</button></div></form>`)}
+function saveInv(e,old){e.preventDefault();const x={id:old||id(),name:i_name.value,cat:i_cat.value,qty:i_qty.value,min:i_min.value,cost:i_cost.value};const j=db.inventory.findIndex(v=>v.id===x.id);j>=0?db.inventory[j]=x:db.inventory.push(x);closeModal();persist()}
+function deleteInv(i){db.inventory=db.inventory.filter(x=>x.id!==i);persist()}
+function renderInventory(){document.getElementById('invCards').innerHTML=db.inventory.length?db.inventory.map(x=>`<div class="client"><h3>${esc(x.name)}</h3><span class="pill">${esc(x.cat||'Sin categoría')}</span><div class="row"><span>Existencia</span><b>${x.qty}</b></div><div class="row"><span>Mínimo ${x.min}</span><span class="pill ${Number(x.qty)<=Number(x.min)?'warn':'ok'}">${Number(x.qty)<=Number(x.min)?'Reponer':'OK'}</span></div><div class="row"><button class="secondary" onclick="openInventory('${x.id}')">Editar</button><button class="danger" onclick="deleteInv('${x.id}')">Eliminar</button></div></div>`).join(''):'<div class="empty">Agrega tus productos, insumos o consumibles.</div>'}
+
+function renderDashboard(){document.getElementById('sClients').textContent=db.clients.length;document.getElementById('sTirze').textContent=db.clients.filter(c=>c.service==='Tirze').length;const today=new Date().toISOString().slice(0,10);document.getElementById('sAppts').textContent=db.appointments.filter(a=>a.date>=today).length;document.getElementById('sDue').textContent=money(db.clients.reduce((s,c)=>s+Number(c.balance||0),0));const upcoming=[...db.appointments].filter(a=>a.date>=today).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,5);document.getElementById('dashCards').innerHTML=upcoming.length?upcoming.map(a=>{const c=db.clients.find(c=>c.id===a.clientId);return `<div class="client"><span class="pill">${a.date}</span><h3>${esc(c?.name||'—')}</h3><div class="muted">${esc(a.service)} ${a.time?'· '+a.time:''}</div></div>`}).join(''):'<div class="empty">No hay citas próximas.</div>'}
+function renderReports(){const revenue=db.payments.reduce((s,p)=>s+Number(p.amount||0),0), apRevenue=db.appointments.reduce((s,a)=>s+Number(a.price||0),0), low=db.inventory.filter(x=>Number(x.qty)<=Number(x.min)).length;document.getElementById('reportCards').innerHTML=`<div class="stat"><span>Pagos registrados</span><b>${money(revenue)}</b></div><div class="stat"><span>Valor de citas</span><b>${money(apRevenue)}</b></div><div class="stat"><span>Productos por reponer</span><b>${low}</b></div><div class="stat"><span>Servicios registrados</span><b>${new Set(db.appointments.map(a=>a.service).filter(Boolean)).size}</b></div>`}
+function renderAll(){renderDashboard();renderClients();renderAppts();renderTirze();renderPayments();renderInventory();renderReports()}
+function backup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='ODARA-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click()}
+function restore(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);persist();alert('Respaldo restaurado.')}catch{alert('El archivo no es válido.')}};r.readAsText(f)}
+function exportCSV(){const rows=[['Clienta','Fecha','Hora','Servicio','Precio'],...db.appointments.map(a=>[db.clients.find(c=>c.id===a.clientId)?.name||'',a.date,a.time,a.service,a.price])];const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='ODARA-citas.csv';a.click()}
+document.getElementById('greeting').textContent='Hola 👋';
+renderAll();
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body></html>
