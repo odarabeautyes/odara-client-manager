@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reservar cita | ODÁRA Beauty Essentials</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f7f3ef;color:#443a35;padding:20px}
+.card{max-width:480px;margin:30px auto;background:white;padding:28px;border-radius:18px}
+h1{text-align:center;letter-spacing:3px}
+p{text-align:center;color:#8c786d}
+label{display:block;margin-top:15px}
+input,select{box-sizing:border-box;width:100%;padding:13px;margin-top:7px;border:1px solid #ddd;border-radius:8px;font-size:16px}
+button{width:100%;padding:15px;margin-top:22px;background:#987b68;color:white;border:0;border-radius:9px;font-size:16px}
+#msg{white-space:pre-wrap;margin-top:15px;text-align:center}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>ODÁRA</h1>
+<p>Beauty Essentials · Book your appointment</p>
+
+<form id="booking">
+<label>Nombre completo</label>
+<input id="name" required>
+
+<label>Teléfono</label>
+<input id="phone" type="tel" required>
+
+<label>Correo electrónico</label>
+<input id="email" type="email">
+
+<label>Servicio</label>
+<select id="service" required>
+<option value="">Selecciona tu servicio</option>
+<option value="Classic Lashes" data-price="65">Classic Lashes — $65</option>
+<option value="Hybrid Lashes" data-price="80">Hybrid Lashes — $80</option>
+<option value="Volume Lashes" data-price="90">Volume Lashes — $90</option>
+<option value="Mega Volume Lashes" data-price="120">Mega Volume Lashes — $120</option>
+<option value="Bikini Line" data-price="40">Bikini Line — $40</option>
+<option value="Bikini Full" data-price="45">Bikini Full — $45</option>
+<option value="Brazilian Wax" data-price="50">Brazilian Wax — $50</option>
+</select>
+
+<label>Fecha</label>
+<input id="date" type="date" required>
+
+<label>Hora preferida</label>
+<input id="time" type="time" required>
+
+<p>Depósito para reservar: <strong>$20 USD</strong></p>
+<button id="submit" type="submit">RESERVAR Y PAGAR</button>
+<div id="msg"></div>
+</form>
+</div>
+
+<script>
+const endpoint = "https://dterplmhtscjoeslweav.supabase.co/functions/v1/create-booking-checkout";
+
+document.getElementById("date").min =
+new Date().toLocaleDateString("en-CA");
+
+document.getElementById("booking").addEventListener("submit",async(e)=>{
+e.preventDefault();
+
+const button=document.getElementById("submit");
+const msg=document.getElementById("msg");
+const service=document.getElementById("service");
+const option=service.selectedOptions[0];
+
+button.disabled=true;
+button.textContent="PROCESANDO...";
+msg.textContent="Preparando tu reservación...";
+
+try{
+const response=await fetch(endpoint,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("name").value.trim(),
+phone:document.getElementById("phone").value.trim(),
+email:document.getElementById("email").value.trim(),
+service:service.value,
+date:document.getElementById("date").value,
+time:document.getElementById("time").value,
+service_price:Number(option.dataset.price),
+success_url:location.origin+location.pathname+"?booking=success",
+cancel_url:location.href
+})
+});
+
+const result=await response.json();
+
+if(!response.ok || !result.checkout_url){
+throw new Error(result.error||"No se pudo iniciar el pago.");
+}
+
+location.href=result.checkout_url;
+
+}catch(error){
+msg.textContent=error.message;
+button.disabled=false;
+button.textContent="RESERVAR Y PAGAR";
+}
+});
+</script>
+</body>
+</html>
