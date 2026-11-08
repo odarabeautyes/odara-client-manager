@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,14 +21,14 @@ button:disabled{opacity:.55;cursor:not-allowed}
 <body>
 <div class="card">
 <h1>ODÁRA</h1>
-<p>Beauty Essentials · Book your appointment</p>
+<p>Beauty Essentials · Book Your Appointment</p>
 <form id="booking">
-<label>Nombre completo</label><input id="name" autocomplete="name" required>
-<label>Teléfono</label><input id="phone" type="tel" autocomplete="tel" required>
-<label>Correo electrónico (opcional)</label><input id="email" type="email" autocomplete="email">
+<label>Full Name</label><input id="name" autocomplete="name" required>
+<label>Phone Number</label><input id="phone" type="tel" autocomplete="tel" required>
+<label>Email Address (optional)</label><input id="email" type="email" autocomplete="email">
 <label>Servicio</label>
 <select id="service" required>
-<option value="">Selecciona tu servicio</option>
+<option value="">Select a service</option>
 <optgroup label="Pestañas">
 <option value="Classic Set">Classic Set — $65</option>
 <option value="Classic Fill">Classic Fill — $45</option>
@@ -63,19 +63,19 @@ button:disabled{opacity:.55;cursor:not-allowed}
 <option value="Upper Lip Wax">Upper Lip Wax — $15</option>
 </optgroup>
 </select>
-<label>Fecha</label><input id="date" type="date" required>
-<label>Horario disponible</label>
-<select id="time" required disabled><option value="">Primero selecciona una fecha</option></select>
-<p>Depósito para solicitar tu cita: <strong>$20 USD</strong></p>
-<button id="submit" type="submit">SOLICITAR CITA</button>
+<label>Date</label><input id="date" type="date" required>
+<label>Available Time</label>
+<select id="time" required disabled><option value="">Please select a date first</option></select>
+<p>Booking deposit: <strong>$20 USD</strong></p>
+<button id="submit" type="submit">REQUEST APPOINTMENT</button>
 <div id="msg" role="status"></div>
 </form>
 <div id="payment" class="payment">
-<h3>¡Solicitud recibida! ✨</h3>
-<p>Tu horario está apartado como <strong>pendiente de depósito</strong>. Para completar tu solicitud, envía $20 USD por una de estas opciones:</p>
-<p><strong>Zelle — Teléfono:</strong> 480-865-8569<br><strong>Zelle — Correo:</strong> Odalis_duarte@hotmail.com</p>
+<h3>Request received! ✨</h3>
+<p>Your time slot is being held as <strong>pending deposit</strong>. To complete your request, send the $20 USD deposit using one of these options:</p>
+<p><strong>Zelle — Phone Number:</strong> 480-865-8569<br><strong>Zelle — Email:</strong> Odalis_duarte@hotmail.com</p>
 <p><strong>Cash App:</strong> $OdalisDuarte</p>
-<p class="note">Envía tu comprobante a ODÁRA. Tu cita quedará confirmada cuando verifiquemos el depósito. Si no realizas el depósito, contacta a ODÁRA para liberar el horario.</p>
+<p class="note">Please send your payment confirmation to ODÁRA. Your appointment will be confirmed once we verify your deposit. If you do not send the deposit, please contact ODÁRA to release the time slot.</p>
 </div>
 </div>
 <script>
@@ -85,33 +85,33 @@ const date=$("date"),time=$("time"),msg=$("msg"),button=$("submit");
 function localDate(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
 date.min=localDate();
 async function loadTimes(){
-  time.disabled=true;time.innerHTML='<option value="">Cargando horarios...</option>';msg.textContent="";
-  if(!date.value){time.innerHTML='<option value="">Primero selecciona una fecha</option>';return}
+  time.disabled=true;time.innerHTML='<option value="">Loading available times...</option>';msg.textContent="";
+  if(!date.value){time.innerHTML='<option value="">Please select a date first</option>';return}
   try{
     const r=await fetch(endpoint+"?date="+encodeURIComponent(date.value));
     const j=await r.json();
-    if(!r.ok)throw new Error(j.error||"No se pudieron consultar los horarios.");
+    if(!r.ok)throw new Error(j.error||"Could not load available times.");
     time.innerHTML="";
-    if(!j.available?.length){time.innerHTML='<option value="">No hay horarios disponibles</option>';return}
+    if(!j.available?.length){time.innerHTML='<option value="">No available times</option>';return}
     time.add(new Option("Selecciona una hora",""));
     j.available.forEach(t=>time.add(new Option(new Date("2000-01-01T"+t).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}),t)));
     time.disabled=false;
-  }catch(e){time.innerHTML='<option value="">Error al cargar horarios</option>';msg.textContent=e.message}
+  }catch(e){time.innerHTML='<option value="">Unable to load times</option>';msg.textContent=e.message}
 }
 date.addEventListener("change",loadTimes);
 $("booking").addEventListener("submit",async e=>{
-  e.preventDefault();button.disabled=true;button.textContent="ENVIANDO...";msg.textContent="Enviando tu solicitud...";
+  e.preventDefault();button.disabled=true;button.textContent="ENVIANDO...";msg.textContent="Submitting your request...";
   try{
     const r=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
       name:$("name").value.trim(),phone:$("phone").value.trim(),email:$("email").value.trim(),
       service:$("service").value,date:date.value,time:time.value
     })});
     const j=await r.json();
-    if(!r.ok)throw new Error(j.error||"No se pudo enviar la solicitud.");
+    if(!r.ok)throw new Error(j.error||"Could not submit your request.");
     $("payment").style.display="block";
     $("booking").style.display="none";
-    msg.textContent="Solicitud registrada. Revisa las instrucciones de depósito.";
-  }catch(err){msg.textContent=err.message;button.disabled=false;button.textContent="SOLICITAR CITA";await loadTimes()}
+    msg.textContent="Your request has been received. Please review the deposit instructions.";
+  }catch(err){msg.textContent=err.message;button.disabled=false;button.textContent="REQUEST APPOINTMENT";await loadTimes()}
 });
 </script>
 </body>
