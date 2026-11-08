@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reservar cita | ODÁRA Beauty Essentials</title>
+<title>Book an Appointment | ODÁRA Beauty Essentials</title>
 <style>
 *{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#f7f3ef;color:#443a35;padding:20px;margin:0}
 .card{max-width:480px;margin:30px auto;background:white;padding:28px;border-radius:18px;box-shadow:0 8px 30px #5a403015}
@@ -26,10 +26,10 @@ button:disabled{opacity:.55;cursor:not-allowed}
 <label>Full Name</label><input id="name" autocomplete="name" required>
 <label>Phone Number</label><input id="phone" type="tel" autocomplete="tel" required>
 <label>Email Address (optional)</label><input id="email" type="email" autocomplete="email">
-<label>Servicio</label>
+<label>Service</label>
 <select id="service" required>
 <option value="">Select a service</option>
-<optgroup label="Pestañas">
+<optgroup label="Lashes">
 <option value="Classic Set">Classic Set — $65</option>
 <option value="Classic Fill">Classic Fill — $45</option>
 <option value="Hybrid Set">Hybrid Set — $80</option>
@@ -41,7 +41,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 <option value="Lash Removal">Lash Removal — $20</option>
 <option value="Lashlift">Lashlift — $45</option>
 </optgroup>
-<optgroup label="Cejas">
+<optgroup label="Brows">
 <option value="Brow Wax">Brow Wax — $15</option>
 <option value="Henna Brows">Henna Brows — $75</option>
 <option value="Microblading">Microblading — $150</option>
@@ -93,14 +93,14 @@ async function loadTimes(){
     if(!r.ok)throw new Error(j.error||"Could not load available times.");
     time.innerHTML="";
     if(!j.available?.length){time.innerHTML='<option value="">No available times</option>';return}
-    time.add(new Option("Selecciona una hora",""));
+    time.add(new Option("Select a time",""));
     j.available.forEach(t=>time.add(new Option(new Date("2000-01-01T"+t).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}),t)));
     time.disabled=false;
   }catch(e){time.innerHTML='<option value="">Unable to load times</option>';msg.textContent=e.message}
 }
 date.addEventListener("change",loadTimes);
 $("booking").addEventListener("submit",async e=>{
-  e.preventDefault();button.disabled=true;button.textContent="ENVIANDO...";msg.textContent="Submitting your request...";
+  e.preventDefault();button.disabled=true;button.textContent="SUBMITTING...";msg.textContent="Submitting your request...";
   try{
     const r=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
       name:$("name").value.trim(),phone:$("phone").value.trim(),email:$("email").value.trim(),
