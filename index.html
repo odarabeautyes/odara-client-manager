@@ -19,7 +19,7 @@ window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.__odaraOneSignalReady = new Promise((resolve, reject) => {
   window.OneSignalDeferred.push(async function(OneSignal) {
     try {
-      await OneSignal.init({ appId: "2e31a59f-cd20-4c12-83b9-89fcc8814099", serviceWorkerPath: "odara-client-manager/OneSignalSDKWorker.js", serviceWorkerParam: { scope: "/odara-client-manager/" } });
+      await OneSignal.init({ appId: "2e31a59f-cd20-4c12-83b9-89fcc8814099", serviceWorkerPath: "/odara-client-manager/OneSignalSDKWorker.js", serviceWorkerParam: { scope: "/odara-client-manager/" }, serviceWorkerOverrideForTypical: true });
       resolve(OneSignal);
     } catch (error) {
       console.error("ODARA OneSignal init error", error);
