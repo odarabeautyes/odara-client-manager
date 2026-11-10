@@ -67,8 +67,7 @@ window.OneSignalDeferred.push(async function(OneSignal) {
 <div id="modal" class="modal hidden"><div class="modalbox"><div class="mhead"><h2 id="mt">Nuevo</h2><button class="x" onclick="closeM()">×</button></div><div id="mb"></div></div></div>
 
 <script>
-// Limpieza de caché/service worker anterior para evitar cargar una versión vieja.
-(async()=>{try{if("serviceWorker" in navigator){const rs=await navigator.serviceWorker.getRegistrations();for(const r of rs)await r.unregister();}if("caches" in window){const ks=await caches.keys();for(const k of ks)await caches.delete(k);}}catch(e){console.warn("Cache cleanup",e)}})();
+// No desregistrar Service Workers: OneSignal necesita mantener su worker activo.
 const SUPA_URL="https://dterplmhtscjoeslweav.supabase.co",KEY="sb_publishable_GpwmY6Aj1C8A1wI0x4iBnw_2uYLD9uo",AUTH=SUPA_URL+"/auth/v1",REST=SUPA_URL+"/rest/v1";
 let TOKEN=localStorage.getItem("odara_access_token")||"",REFRESH=localStorage.getItem("odara_refresh_token")||"",USER=localStorage.getItem("odara_email")||"";
 let D={c:[],a:[],p:[],i:[],t:[],s:[],f:[],mt:[],mq:[],os:null,oq:[]}, apptFilter="", apptMode="active"; const $=id=>document.getElementById(id);
