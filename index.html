@@ -87,7 +87,7 @@ function render(){
 $("sc").textContent=D.c.length;$("sa").textContent=D.a.length;$("sb").textContent=money(D.c.reduce((a,x)=>a+(+x.balance||0),0));
 let ym=today().slice(0,7);$("sm").textContent=money(D.p.filter(x=>(x.payment_date||"").startsWith(ym)).reduce((a,x)=>a+(+x.amount||0),0));$("sl").textContent=D.i.filter(x=>+x.quantity<=+x.minimum_quantity).length;
 let upcoming=D.a.filter(x=>x.appointment_date>=today()).slice(0,8);$("nextAppts").innerHTML=upcoming.length?upcoming.map(apptRow).join(""):`<div class="empty">No hay próximas citas.</div>`;
-let t=D.a.filter(x=>x.appointment_date===today()).length;$("todayNotice").innerHTML=t?`<div class="notice"><b>Hoy tienes ${t} cita${t>1?"s":""}.</b> Revisa la sección Citas.</div>`:"";
+let t=D.a.filter(x=>x.appointment_date===today()).length;const todayNotice=$("todayNotice");if(todayNotice)todayNotice.innerHTML=t?`<div class="notice"><b>Hoy tienes ${t} cita${t>1?"s":""}.</b> Revisa la sección Citas.</div>`:"";
 let q=($("search")?.value||"").toLowerCase();let cs=D.c.filter(x=>(x.name+" "+(x.phone||"")).toLowerCase().includes(q));$("clientList").innerHTML=cs.length?cs.map(clientRow).join(""):`<div class="empty">No hay clientas.</div>`;
 let aa=apptFilter?D.a.filter(x=>x.appointment_date===apptFilter):D.a;$("apptList").innerHTML=aa.length?aa.map(apptRow).join(""):`<div class="empty">No hay citas.</div>`;
 $("payList").innerHTML=D.p.length?D.p.map(x=>`<div class="row"><div class="rowtop"><b>${esc(clientName(x.client_id))}</b><b>${money(x.amount)}</b></div><div class="muted">${fmtDate(x.payment_date)} · ${esc(x.method||"")} ${x.note?`· ${esc(x.note)}`:""}</div></div>`).join(""):`<div class="empty">No hay pagos.</div>`;
