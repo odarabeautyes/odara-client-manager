@@ -12,14 +12,22 @@ main{max-width:1150px;margin:auto;padding:16px}.panel{padding:16px;margin-bottom
 @media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr}.user{display:none}.dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom-nav{position:fixed;display:flex;z-index:15;bottom:0;left:0;right:0;height:70px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));justify-content:space-around;align-items:center;background:#fffdfb;border-top:1px solid #e8ddd4;box-shadow:0 -5px 20px #5d47300d}.bottom-item{flex:1}.bottom-add{flex:0 0 48px}.top{padding:10px 14px}main{padding:14px 12px 92px}.welcome{padding:22px 20px}.welcome h1{font-size:27px}.welcome-mark{font-size:54px}}
 @media(max-width:520px){.grid,.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.top{padding:10px}.modalbox{padding:14px}.app-tile{min-height:125px;padding:14px}.section-heading h2{font-size:22px}.welcome{border-radius:19px}.welcome p{font-size:13px}}
 @media(max-width:520px){.grid,.stats{grid-template-columns:1fr}.top{padding:11px}.tabs{top:54px}main{padding:10px}.modalbox{padding:14px}}
-</style></head><body>
+</style>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.OneSignalDeferred.push(async function(OneSignal) {
+  await OneSignal.init({ appId: "2e31a59f-cd20-4c12-83b9-89fcc8814099" });
+});
+</script>
+</head><body>
 
 <div id="login" class="login"><div class="card"><div class="logo">ODÁRA</div><div class="sub">Beauty Essentials · Client Manager</div>
 <label>Correo</label><input id="email" class="field" type="email" autocomplete="username">
 <label>Contraseña</label><input id="password" class="field" type="password" autocomplete="current-password">
 <button id="loginBtn" class="primary wide">Entrar</button><div id="msg" class="msg"></div></div></div>
 
-<div id="app" class="hidden"><header class="top"><div class="top-left"><button class="icon-btn" onclick="showView('home')" aria-label="Inicio">☰</button></div><div class="brand">ODÁRA<small style="display:block;font:9px Arial;letter-spacing:3px;margin-top:2px">SPA MANAGER</small></div><div class="top-right"><span id="user" class="muted user"></span><button class="icon-btn" onclick="showView('settings')" aria-label="Configuración">♧</button><button id="logout" class="logout">Salir</button></div></header>
+<div id="app" class="hidden"><header class="top"><div class="top-left"><button class="icon-btn" onclick="showView('home')" aria-label="Inicio">☰</button></div><div class="brand">ODÁRA<small style="display:block;font:9px Arial;letter-spacing:3px;margin-top:2px">SPA MANAGER</small></div><div class="top-right"><span id="user" class="muted user"></span><button class="secondary" style="padding:8px 10px;font-size:12px" onclick="activarAvisosODARA()">Activar avisos</button><button class="icon-btn" onclick="showView('settings')" aria-label="Configuración">♧</button><button id="logout" class="logout">Salir</button></div></header>
 <nav class="tabs">
 <button class="tab active" data-v="home">Inicio</button><button class="tab" data-v="clients">Clientas</button><button class="tab" data-v="appts">Citas</button><button class="tab" data-v="payments">Pagos</button><button class="tab" data-v="inventory">Inventario</button><button class="tab" data-v="services">Servicios</button><button class="tab" data-v="protocols">Protocolos faciales</button><button class="tab" data-v="tirze">Tirze</button><button class="tab" data-v="reports">Reportes</button><button class="tab" data-v="messages">Mensajes automáticos</button><button class="tab" data-v="settings">Ajustes</button>
 </nav><main>
@@ -180,4 +188,14 @@ async function saveProtocol(id){try{let r={service_name:$("fname").value.trim(),
 async function seedProtocols(){if(!confirm("Se agregarán cinco plantillas iniciales. Puedes editarlas después. ¿Continuar?"))return;try{for(const p of DEFAULT_PROTOCOLS){if(D.f.some(x=>x.service_name.toLowerCase()===p.service_name.toLowerCase()))continue;await api("/facial_protocols",{method:"POST",body:JSON.stringify(p)})}await load();toast("Plantillas agregadas.")}catch(e){toast("No se pudieron cargar las plantillas. Verifica la migración: "+e.message)}}
 async function deleteProtocol(id){if(!confirm("¿Eliminar este protocolo?"))return;try{await api("/facial_protocols?id=eq."+encodeURIComponent(id),{method:"DELETE"});await load()}catch(e){toast(e.message)}}
 
+
+async function activarAvisosODARA(){
+  if (!window.OneSignalDeferred) { toast("El servicio de avisos todavía está cargando. Intenta de nuevo."); return; }
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    try {
+      await OneSignal.Slidedown.promptPush();
+      toast("Sigue el permiso de notificaciones en tu iPhone.");
+    } catch(e) { toast("No se pudo abrir el permiso: " + (e.message || e)); }
+  });
+}
 </script></body></html>
