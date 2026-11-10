@@ -222,14 +222,21 @@ async function activarAvisosODARA(){
         toast("Este navegador no admite avisos push. Abre ODÁRA desde su icono de inicio.");
         return;
       }
-      if (OneSignal.Notifications.permission) {
-        toast("Los avisos ya están permitidos en este dispositivo.");
-        return;
+      if (!OneSignal.Notifications.permission) {
+        const granted = await OneSignal.Notifications.requestPermission();
+        if (!granted) {
+          toast("No se concedió el permiso. Revisa Ajustes del iPhone > Notificaciones.");
+          return;
+        }
       }
-      const granted = await OneSignal.Notifications.requestPermission();
-      toast(granted ? "¡Avisos activados en este dispositivo!" : "No se concedió el permiso. Revisa Ajustes del iPhone > Notificaciones.");
+      // El permiso del sistema no siempre crea la suscripción: solicitar el opt-in explícitamente.
+      await OneSignal.User.PushSubscription.optIn();
+      const ownerId = odaraAuthUserId();
+      if (ownerId) await OneSignal.login(ownerId);
+      toast("Solicitud de registro enviada. Espera unos segundos y revisa Subscriptions en OneSignal.");
     } catch(e) {
-      toast("No se pudo activar: " + (e.message || e));
+      console.error("ODARA OneSignal opt-in error", e);
+      toast("No se pudo registrar el dispositivo: " + (e.message || e));
     }
   });
 }
