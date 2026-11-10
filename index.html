@@ -16,8 +16,16 @@ main{max-width:1150px;margin:auto;padding:16px}.panel{padding:16px;margin-bottom
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
 window.OneSignalDeferred = window.OneSignalDeferred || [];
-window.OneSignalDeferred.push(async function(OneSignal) {
-  await OneSignal.init({ appId: "2e31a59f-cd20-4c12-83b9-89fcc8814099", serviceWorkerPath: "/odara-client-manager/OneSignalSDKWorker.js", serviceWorkerParam: { scope: "/odara-client-manager/" } });
+window.__odaraOneSignalReady = new Promise((resolve, reject) => {
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    try {
+      await OneSignal.init({ appId: "2e31a59f-cd20-4c12-83b9-89fcc8814099", serviceWorkerPath: "/odara-client-manager/OneSignalSDKWorker.js", serviceWorkerParam: { scope: "/odara-client-manager/" } });
+      resolve(OneSignal);
+    } catch (error) {
+      console.error("ODARA OneSignal init error", error);
+      reject(error);
+    }
+  });
 });
 </script>
 </head><body>
@@ -205,38 +213,27 @@ function vincularOneSignalODARA(){
   });
 }
 async function activarAvisosODARA(){
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  if (isIOS && !isStandalone) {
-    toast("En iPhone, abre ODÁRA desde el icono de tu pantalla de inicio para activar avisos.");
-    return;
-  }
-  if (!window.OneSignalDeferred) {
-    toast("OneSignal todavía está cargando. Cierra y vuelve a abrir ODÁRA.");
-    return;
-  }
-  window.OneSignalDeferred.push(async function(OneSignal) {
-    try {
-      if (!OneSignal.Notifications.isPushSupported()) {
-        toast("Este navegador no admite avisos push. Abre ODÁRA desde su icono de inicio.");
-        return;
-      }
-      if (!OneSignal.Notifications.permission) {
-        const granted = await OneSignal.Notifications.requestPermission();
-        if (!granted) {
-          toast("No se concedió el permiso. Revisa Ajustes del iPhone > Notificaciones.");
-          return;
-        }
-      }
-      // El permiso del sistema no siempre crea la suscripción: solicitar el opt-in explícitamente.
-      await OneSignal.User.PushSubscription.optIn();
-      const ownerId = odaraAuthUserId();
-      if (ownerId) await OneSignal.login(ownerId);
-      toast("Solicitud de registro enviada. Espera unos segundos y revisa Subscriptions en OneSignal.");
-    } catch(e) {
-      console.error("ODARA OneSignal opt-in error", e);
-      toast("No se pudo registrar el dispositivo: " + (e.message || e));
+  toast("Conectando con el servicio de notificaciones…");
+  try {
+    if (!window.__odaraOneSignalReady) throw new Error("No se inició OneSignal. Cierra ODÁRA y vuelve a abrirla.");
+    const OneSignal = await Promise.race([
+      window.__odaraOneSignalReady,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("OneSignal tardó demasiado en cargar. Revisa tu conexión y vuelve a abrir ODÁRA.")), 15000))
+    ]);
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    if (isIOS && !isStandalone) throw new Error("Abre ODÁRA desde el icono instalado en la pantalla de inicio.");
+    if (!OneSignal.Notifications.isPushSupported()) throw new Error("Este dispositivo no admite avisos push en esta sesión.");
+    if (!OneSignal.Notifications.permission) {
+      const granted = await OneSignal.Notifications.requestPermission();
+      if (!granted) throw new Error("No se concedió el permiso. Actívalo en Ajustes del iPhone > Notificaciones > ODÁRA.");
     }
-  });
-}
-</script></body></html>
+    await OneSignal.User.PushSubscription.optIn();
+    const ownerId = odaraAuthUserId();
+    if (ownerId) await OneSignal.login(ownerId);
+    toast("¡Listo! Solicitud de registro enviada. Espera unos segundos y revisa OneSignal.");
+  } catch(e) {
+    console.error("ODARA OneSignal opt-in error", e);
+    toast("Error al activar avisos: " + (e.message || e));
+  }
+}>
