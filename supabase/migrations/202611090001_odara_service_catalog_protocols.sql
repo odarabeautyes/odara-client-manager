@@ -40,3 +40,10 @@ drop policy if exists "Users manage their own facial protocols" on public.facial
 create policy "Users manage their own facial protocols" on public.facial_protocols
   for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
 
+
+-- Prevent simultaneous active bookings for the same date and time.
+-- Cancelled/expired appointments do not block the slot.
+create unique index if not exists appointments_unique_active_slot_idx
+  on public.appointments (appointment_date, appointment_time)
+  where appointment_time is not null
+    and status not in ('Cancelada', 'Cancelled', 'Cancelado', 'Expirada', 'Expired');
