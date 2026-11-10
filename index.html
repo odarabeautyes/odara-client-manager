@@ -17,7 +17,7 @@ main{max-width:1150px;margin:auto;padding:16px}.panel{padding:16px;margin-bottom
 <script>
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.OneSignalDeferred.push(async function(OneSignal) {
-  await OneSignal.init({ appId: "2e31a59f-cd20-4c12-83b9-89fcc8814099" });
+  await OneSignal.init({ appId: "2e31a59f-cd20-4c12-83b9-89fcc8814099", serviceWorkerPath: "/odara-client-manager/OneSignalSDKWorker.js", serviceWorkerParam: { scope: "/odara-client-manager/" } });
 });
 </script>
 </head><body>
@@ -206,12 +206,31 @@ function vincularOneSignalODARA(){
   });
 }
 async function activarAvisosODARA(){
-  if (!window.OneSignalDeferred) { toast("El servicio de avisos todavía está cargando. Intenta de nuevo."); return; }
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  if (isIOS && !isStandalone) {
+    toast("En iPhone, abre ODÁRA desde el icono de tu pantalla de inicio para activar avisos.");
+    return;
+  }
+  if (!window.OneSignalDeferred) {
+    toast("OneSignal todavía está cargando. Cierra y vuelve a abrir ODÁRA.");
+    return;
+  }
   window.OneSignalDeferred.push(async function(OneSignal) {
     try {
-      await OneSignal.Slidedown.promptPush();
-      toast("Sigue el permiso de notificaciones en tu iPhone.");
-    } catch(e) { toast("No se pudo abrir el permiso: " + (e.message || e)); }
+      if (!OneSignal.Notifications.isPushSupported()) {
+        toast("Este navegador no admite avisos push. Abre ODÁRA desde su icono de inicio.");
+        return;
+      }
+      if (OneSignal.Notifications.permission) {
+        toast("Los avisos ya están permitidos en este dispositivo.");
+        return;
+      }
+      const granted = await OneSignal.Notifications.requestPermission();
+      toast(granted ? "¡Avisos activados en este dispositivo!" : "No se concedió el permiso. Revisa Ajustes del iPhone > Notificaciones.");
+    } catch(e) {
+      toast("No se pudo activar: " + (e.message || e));
+    }
   });
 }
 </script></body></html>
