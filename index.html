@@ -153,7 +153,7 @@ function exportInventory(){csv([["Producto","Categoria","Cantidad","Minimo","Cos
 function backup(){let data={exported_at:new Date().toISOString(),clients:D.c,appointments:D.a,payments:D.p,inventory:D.i,tirze_records:D.t};let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="odara-respaldo.json";a.click()}
 $("search").oninput=render;$("apptDateFilter").onchange=e=>{apptFilter=e.target.value;render()};function clearApptFilter(){apptFilter="";$("apptDateFilter").value="";render()}
 $("loginBtn").onclick=async()=>{let email=$("email").value.trim(),password=$("password").value;if(!email||!password)return toast("Escribe tu correo y contraseña.");let b=$("loginBtn");b.disabled=true;b.textContent="Entrando…";$("msg").textContent="Conectando…";try{let j=await auth("/token?grant_type=password",{method:"POST",body:JSON.stringify({email,password})});saveSession(j);USER=email;localStorage.setItem("odara_email",email);await showApp()}catch(e){$("msg").textContent=e.message}finally{b.disabled=false;b.textContent="Entrar"}};
-async function showApp(){try{$("login").classList.add("hidden");$("app").classList.remove("hidden");$("user").textContent=USER;$("welcomeName").textContent=(USER.split("@")[0]||"bienvenida").split(/[._-]/)[0];await load()}catch(e){console.error("ODARA load error",e,e?.stack);$("app").classList.add("hidden");$("login").classList.remove("hidden");$("msg").textContent="Error al cargar tus datos: "+(e?.message||String(e))}}
+async function showApp(){try{$("login").classList.add("hidden");$("app").classList.remove("hidden");$("user").textContent=USER;$("welcomeName").textContent=(USER.split("@")[0]||"bienvenida").split(/[._-]/)[0];vincularOneSignalODARA();await load()}catch(e){console.error("ODARA load error",e,e?.stack);$("app").classList.add("hidden");$("login").classList.remove("hidden");$("msg").textContent="Error al cargar tus datos: "+(e?.message||String(e))}}
 function showView(id){document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));$(id)?.classList.remove("hidden");document.querySelectorAll(".bottom-item").forEach(x=>x.classList.toggle("active",x.dataset.v===id));window.scrollTo({top:0,behavior:"smooth"})}
 $("logout").onclick=()=>{clearSession();location.reload()};
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>showView(b.dataset.v));document.querySelectorAll(".bottom-item").forEach(b=>b.onclick=()=>showView(b.dataset.v));
@@ -189,6 +189,22 @@ async function seedProtocols(){if(!confirm("Se agregarán cinco plantillas inici
 async function deleteProtocol(id){if(!confirm("¿Eliminar este protocolo?"))return;try{await api("/facial_protocols?id=eq."+encodeURIComponent(id),{method:"DELETE"});await load()}catch(e){toast(e.message)}}
 
 
+function odaraAuthUserId(){
+  try {
+    const part = (TOKEN || "").split(".")[1];
+    if (!part) return "";
+    const payload = JSON.parse(atob(part.replace(/-/g,"+").replace(/_/g,"/")));
+    return payload.sub || "";
+  } catch(e) { return ""; }
+}
+function vincularOneSignalODARA(){
+  const ownerId = odaraAuthUserId();
+  if (!ownerId || !window.OneSignalDeferred) return;
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    try { await OneSignal.login(ownerId); }
+    catch(e) { console.warn("OneSignal identity link failed", e); }
+  });
+}
 async function activarAvisosODARA(){
   if (!window.OneSignalDeferred) { toast("El servicio de avisos todavía está cargando. Intenta de nuevo."); return; }
   window.OneSignalDeferred.push(async function(OneSignal) {
