@@ -1,5 +1,5 @@
-const CACHE='odara-v6';
-const ASSETS=['./','./index.html','./manifest.json'];
+const CACHE='odara-v7';
+const ASSETS=['./','./index.html','./manifest.json','./odara-icon.svg'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
   await cache.addAll(ASSETS);
