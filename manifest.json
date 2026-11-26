@@ -6,5 +6,12 @@
   "background_color": "#f7f3ef",
   "theme_color": "#9a7b68",
   "lang": "es",
-  "icons": []
+  "icons": [
+    {
+      "src": "odara-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
