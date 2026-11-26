@@ -132,7 +132,7 @@ async function saveAvailabilityOverride(isOpen){
  if(isOpen){
    times=($("availabilityTimes")?.value||"").split(",").map(x=>x.trim()).filter(Boolean);
    if(!times.length)return toast("Escribe al menos un horario para abrir este día.");
-   if(times.some(t=>!/^([01]\d|2[0-3]):[0-5]\d$/.test(t)))return toast("Usa horarios en formato HH:MM, por ejemplo 10:00.");
+   const allowedTimes=[];for(let h=8;h<=20;h++){allowedTimes.push(String(h).padStart(2,"0")+":00",String(h).padStart(2,"0")+":30");}if(times.some(t=>!allowedTimes.includes(t)))return toast("Usa horarios cada 30 minutos, entre 08:00 y 20:30.");
    times=[...new Set(times)].sort();
  }
  try{
