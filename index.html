@@ -203,7 +203,7 @@ function openCompleteAppt(id){
  let html="<p>Servicio: <b>"+esc(a.service||"Servicio")+"</b></p><p>Precio: <b>"+money(a.price)+"</b></p><p>Depósitos y pagos recibidos: <b>"+money(paid)+"</b></p><p>Saldo que se registrará como ingreso: <b>"+money(due)+"</b></p>";
  if(due>0)html+='<label>Método de pago del saldo</label><select id="completeMethod" class="field"><option>Cash</option><option>Zelle</option><option>CashApp</option><option>Tarjeta</option><option>Transferencia</option><option>Otro</option></select>';
  else html+='<p class="muted">La cita ya está cubierta; no se agregará otro ingreso.</p>';
- html+='<button class="primary wide" onclick="finishAppointment(\\\''+id+'\\\','+due+')">Confirmar y completar</button>';
+  html+="<button class=\"primary wide\" onclick=\"finishAppointment('"+id+"',"+due+")\">Confirmar y completar</button>";
  modal("Completar cita",html);
 }
 async function finishAppointment(id,due){
